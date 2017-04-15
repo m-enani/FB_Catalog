@@ -140,9 +140,7 @@ public class FantasticBeastsCatalog {
 				String temp = catalog.nextLine();
 				
 				word = temp.split(",");
-				
-				System.out.println(word[0]);
-				
+								
 				if(word[0].trim().replaceAll("\\s+","").toLowerCase().startsWith(searchTerm.toLowerCase())) {
 				
 					result[0] = ("Name: " + word[0].trim());

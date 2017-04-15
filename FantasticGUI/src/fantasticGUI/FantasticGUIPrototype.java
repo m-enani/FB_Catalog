@@ -91,7 +91,7 @@ public class FantasticGUIPrototype extends Application{
 		
 		// alert(s)
 		// final Alert alert = new Alert(AlertType.CONFIRMATION); // TO-DO: ask user if they would like to enter additional food
-		
+			
 		// boxes
 		final VBox bxMenu = new VBox(5); // box to store menu options
 		final VBox imageContainer = new VBox(5); // box to store image 
@@ -363,10 +363,12 @@ public class FantasticGUIPrototype extends Application{
 		FadeTransition ft = new FadeTransition(Duration.millis(1500),bgImage);
 		ft.setFromValue(0.0);
 		ft.setToValue(1.0);
-		ft.play();
+		ft.play();	
 		
 		primaryStage.show();
 		intro.play();
+		
+		
 			
 		// event handling
 		
@@ -434,6 +436,7 @@ public class FantasticGUIPrototype extends Application{
 				
 				clearPane(pointerImage, btBrowse, btEntry);
 				
+				TypewriterAnimation(lblMessage, lblMessage.getText());
 				
 				pane.getChildren().addAll(btMainMenu, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEntryName, txtFoodName);
 				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
@@ -443,7 +446,7 @@ public class FantasticGUIPrototype extends Application{
 				GridPane.setMargin(bxEntryName, new Insets(50,0,0,275));
 				GridPane.setMargin(bxEntryFood, new Insets(175,0,0,275));
 				GridPane.setMargin(btSubmitEntry, new Insets(300,0,0,660));
-
+				
 			}
 		});
 		
@@ -650,6 +653,23 @@ public class FantasticGUIPrototype extends Application{
 		pane.getChildren().remove(pointerImage);
 		pane.getChildren().remove(btBrowse);
 		pane.getChildren().remove(btEntry);
+	}
+	
+	public void TypewriterAnimation(Label lbl, String message){
+		final Animation text = new Transition() {
+			
+			{
+				setCycleDuration(Duration.millis(4500));
+			}
+
+			protected void interpolate(double frac) {
+				final int length = message.length();
+				final int n = Math.round(length * (float) frac);
+				lbl.setText(message.substring(0, n));	
+			}
+		};
+		text.play();
+		
 	}
 
 	public static void main(String[] args) { 
