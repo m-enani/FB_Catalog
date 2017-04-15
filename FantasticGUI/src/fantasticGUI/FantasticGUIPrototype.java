@@ -649,12 +649,14 @@ public class FantasticGUIPrototype extends Application{
 		
 	}
 	
+	// clears homescreen elements in preparation for new screen
 	public void clearPane(ImageView pointerImage, Button btBrowse, Button btEntry){
 		pane.getChildren().remove(pointerImage);
 		pane.getChildren().remove(btBrowse);
 		pane.getChildren().remove(btEntry);
 	}
 	
+	// creates a typewriter like animation on text
 	public void TypewriterAnimation(Label lbl, String message){
 		final Animation text = new Transition() {
 			
