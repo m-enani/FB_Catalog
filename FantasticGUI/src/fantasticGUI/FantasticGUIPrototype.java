@@ -55,14 +55,19 @@ public class FantasticGUIPrototype extends Application{
 	
 	Media cursorFile = new Media(new File("bin/sound/Cursor.wav").toURI().toString());
 	Media introFile = new Media(new File("bin/sound/Intro.wav").toURI().toString());
+	Media writeFile = new Media(new File("bin/sound/write.mp3").toURI().toString());
 	
 	MediaPlayer cursor = new MediaPlayer(cursorFile);
 	MediaPlayer intro = new MediaPlayer(introFile);
+	MediaPlayer write = new MediaPlayer(writeFile);
 	
 	static PathTransition ptBrowse = new PathTransition();
 	static PathTransition ptEntry = new PathTransition();
 	
 	static FantasticBeastsCatalog myBeasts; 
+	
+	static Image image;
+	static ImageView bgImage = new ImageView(image);
 	
 	static boolean homeScreen = true; // used to determine enter button function
 	static boolean newSearch = true; // used to determine if txtSearch properties need to change
@@ -82,7 +87,9 @@ public class FantasticGUIPrototype extends Application{
 	private GridPane pane = new GridPane(); // main pane 
 	
 	public void start(Stage primaryStage) {
-			
+		
+		System.out.println(javafx.scene.text.Font.getFamilies());
+		
 		// pane(s)
 		final ScrollPane sp = new ScrollPane();
 			
@@ -115,13 +122,13 @@ public class FantasticGUIPrototype extends Application{
 		Path browsePath = new Path();
 			
 		// image(s)
-		Image image = new Image("image/background.jpg", 1024, 691.5, false, false); 
 		Image pointer = new Image ("image/pointer.png");
 		Image selectedImage = new Image ("image/placeholder1.png"); // image of selected beast (temporary set to placeholder image) 
+		image = new Image("image/background.jpg", 1024, 691.5, false, false); 
 		
 		final ImageView displayImage = new ImageView(selectedImage);
 		final ImageView pointerImage = new ImageView(pointer); 	
-		final ImageView bgImage = new ImageView(image);
+		bgImage = new ImageView(image);
 			
 		
 		browsePath.getElements().add(new MoveTo(63, 20));
@@ -148,8 +155,8 @@ public class FantasticGUIPrototype extends Application{
 		Label lblSearch = new Label("SEARCH:");
 		Label lblEntryName = new Label("NAME:");
 		Label lblFoodName = new Label("FOOD:");
-		Label lblMessageHeader = new Label ("MESSAGE:");
-		Label lblMessage = new Label("You've found a new beast?! Great! Please enter the information you have on the beast below:");
+		Label lblMessageHeader = new Label ("Newt:");
+		Label lblMessage = new Label("You've found a new beast?!");
 		
 		// input(s)
 		final TextField txtSearch = new TextField();
@@ -173,7 +180,7 @@ public class FantasticGUIPrototype extends Application{
 		txtFoodName.setPrefHeight(40);
 		txtFoodName.setStyle("-fx-font-size: 15px;" + 
 				"-fx-text-fill: #a9a9a9;");
-		txtFoodName.setText("Enter name of the food it eats...");
+		txtFoodName.setText("Enter the name of the food it eats...");
 		
 		// label attributes
 		lblSearch.setStyle("-fx-font-weight: bold; "
@@ -196,7 +203,9 @@ public class FantasticGUIPrototype extends Application{
 		
 		lblMessageHeader.setWrapText(true);
 		lblMessage.setWrapText(true);
-		lblMessage.setStyle("-fx-font-size: 16px;");
+		lblMessage.setStyle("-fx-font-size: 22px;" +
+				 "-fx-font-family: 'Brush Script MT';" + 
+				 "-fx-text-fill: #0F4C5C;");
 		
 		// box attributes
 		bxSearch.setPadding(new Insets(15,0,15,15));
@@ -369,7 +378,6 @@ public class FantasticGUIPrototype extends Application{
 		intro.play();
 		
 		
-			
 		// event handling
 		
 		//change cursor to hand on hover over button
@@ -414,9 +422,13 @@ public class FantasticGUIPrototype extends Application{
 				
 				homeScreen = false;
 				
-				clearPane(pointerImage, btBrowse, btEntry);
+				clearPane(pointerImage, bgImage, btBrowse, btEntry);
 				
-				pane.getChildren().addAll(btMainMenu, bxSearch, btSearch, txtSearch, btReset, imageContainer, root);
+				image = new Image("image/black_bg.png", 1024, 691.5, false, false);
+				
+				bgImage = new ImageView(image);
+				
+				pane.getChildren().addAll(bgImage, btMainMenu, bxSearch, btSearch, txtSearch, btReset, imageContainer, root);
 				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
 				GridPane.setMargin(bxSearch, new Insets(-200,0,0,200));
 				GridPane.setMargin(txtSearch, new Insets(-200,440,0,310));
@@ -434,11 +446,36 @@ public class FantasticGUIPrototype extends Application{
 				
 				homeScreen = false;
 				
-				clearPane(pointerImage, btBrowse, btEntry);
+				clearPane(pointerImage, bgImage, btBrowse, btEntry);
 				
-				TypewriterAnimation(lblMessage, lblMessage.getText());
+				TypewriterAnimation(lblMessage, "You've found a new beast?!", 1500);
 				
-				pane.getChildren().addAll(btMainMenu, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEntryName, txtFoodName);
+			    PauseTransition pause = new PauseTransition(
+			            Duration.seconds(2)
+			        );
+			    
+			    pause.setOnFinished(event -> {
+			    	
+			    	TypewriterAnimation(lblMessage, "Great!", 500);
+			    });
+				
+			    pause.play();
+			    
+			    pause = new PauseTransition(
+			            Duration.seconds(4)
+			        );
+			    
+			    pause.setOnFinished(event -> {
+			    	TypewriterAnimation(lblMessage, "Please enter the information you have gathered below:", 1500);
+			    });
+			    
+			    pause.play();
+				
+				image = new Image("image/black_bg.png", 1024, 691.5, false, false);
+				
+				bgImage = new ImageView(image);
+				
+				pane.getChildren().addAll(bgImage, btMainMenu, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEntryName, txtFoodName);
 				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
 				GridPane.setMargin(bxMessage, new Insets(-200,0,0,275));
 				GridPane.setMargin(txtEntryName, new Insets(50,355,0,390));
@@ -461,6 +498,12 @@ public class FantasticGUIPrototype extends Application{
 				optionSelected = 1;
 				
 				pane.getChildren().clear();
+				
+				image = new Image("image/background.jpg", 1024, 691.5, false, false);
+				
+				bgImage = new ImageView(image);
+				
+				
 				setPane(bgImage, pointerImage, btBrowse, btEntry);
 				
 				ptEntry.stop();
@@ -515,13 +558,15 @@ public class FantasticGUIPrototype extends Application{
 				
 				try {
 					String results = myBeasts.enterData(txtEntryName.getText(), txtFoodName.getText());
-					lblMessage.setText(results);
+					TypewriterAnimation(lblMessage, results, 1500);
 					txtEntryName.setStyle("-fx-font-size: 15px;" + 
 							"-fx-text-fill: #a9a9a9;");
 					txtEntryName.setText("Enter the name of the creature...");
 					txtFoodName.setStyle("-fx-font-size: 15px;" + 
 							"-fx-text-fill: #a9a9a9;");
-					txtFoodName.setText("Enter name of the food it eats...");
+					txtFoodName.setText("Enter the name of the food it eats...");
+					newBeast = true;
+					newFood = true;
 				
 				} catch (IOException e1) {
 					System.out.println("Not Found");
@@ -645,23 +690,23 @@ public class FantasticGUIPrototype extends Application{
 		GridPane.setMargin(btEntry, new Insets(490,0,0, 540));
 
 		ptBrowse.play();
-
-		
+	
 	}
 	
 	// clears homescreen elements in preparation for new screen
-	public void clearPane(ImageView pointerImage, Button btBrowse, Button btEntry){
+	public void clearPane(ImageView pointerImage, ImageView bgImage, Button btBrowse, Button btEntry){
 		pane.getChildren().remove(pointerImage);
+		pane.getChildren().remove(bgImage);
 		pane.getChildren().remove(btBrowse);
 		pane.getChildren().remove(btEntry);
 	}
 	
 	// creates a typewriter like animation on text
-	public void TypewriterAnimation(Label lbl, String message){
+	public void TypewriterAnimation(Label lbl, String message, int duration){
 		final Animation text = new Transition() {
 			
 			{
-				setCycleDuration(Duration.millis(4500));
+				setCycleDuration(Duration.millis(duration));
 			}
 
 			protected void interpolate(double frac) {
@@ -671,6 +716,8 @@ public class FantasticGUIPrototype extends Application{
 			}
 		};
 		text.play();
+		write.stop();
+		write.play();
 		
 	}
 

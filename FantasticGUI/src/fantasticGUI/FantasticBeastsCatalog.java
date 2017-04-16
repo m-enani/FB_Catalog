@@ -71,13 +71,20 @@ public class FantasticBeastsCatalog {
 		catalog = new Scanner(file);
 		output = new PrintWriter(new FileWriter(file, true)); 
 		
+		if ((nameEntered.equals("Enter the name of the creature...") || nameEntered.trim().equals(""))  && (foodEntered.equals("Enter the name of the food it eats...") || foodEntered.trim().equals("")))  {
+			return "It seems like you may have forgotten to enter the information. Please try again:";
+		}
+		else if((!nameEntered.equals("Enter the name of the creature...") || !nameEntered.trim().equals("")) && (foodEntered.equals("Enter the name of the food it eats...")|| foodEntered.trim().equals(""))){
+			return "No leads on the diet of this creature, huh? It's quite alright - your entry has still been submitted! Please come back and let me know if you ever find out!";
+		}
+		
 		// determine if word is already in the catalog
 		while(catalog.hasNext()) {
 				
 			String temp = catalog.nextLine();
 			
 			String[] word = temp.split(",");
-
+			
 			if(word[0].trim().toLowerCase().equals(nameEntered.toLowerCase())) {
 				matchesFound = true;
 				break;
