@@ -15,6 +15,7 @@
 package fantasticGUI;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -46,10 +47,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-
 
 public class FantasticGUIPrototype extends Application{
 	
@@ -67,7 +67,10 @@ public class FantasticGUIPrototype extends Application{
 	static FantasticBeastsCatalog myBeasts; 
 	
 	static Image image;
+	static Image selectedImage;
+	
 	static ImageView bgImage = new ImageView(image);
+	static ImageView displayImage = new ImageView(selectedImage); ;
 	
 	static boolean homeScreen = true; // used to determine enter button function
 	static boolean newSearch = true; // used to determine if txtSearch properties need to change
@@ -77,7 +80,9 @@ public class FantasticGUIPrototype extends Application{
 	
 	static String[] results;
 	static String[] name;
-	static String[] food; 
+	static String[] food;
+	static String oldImagePath;
+	static String imagePath;
 	
 	static{
 		try {
@@ -116,6 +121,7 @@ public class FantasticGUIPrototype extends Application{
 		final Button btEntry = new Button("New Entry");
 		final Button btSubmitEntry = new Button("Submit");
 		final Button btSearch = new Button("Search");
+		final Button btAddImage = new Button("Add Image");
 		final Button btReset = new Button("Reset");
 		final Button btEdit = new Button("Edit");
 		final Button btMainMenu = new Button("Main Menu");
@@ -128,10 +134,9 @@ public class FantasticGUIPrototype extends Application{
 			
 		// image(s)
 		Image pointer = new Image ("image/pointer.png");
-		Image selectedImage = new Image ("image/placeholder1.png"); // image of selected beast (temporary set to placeholder image) 
+		selectedImage = new Image ("image/placeholder1.png", 150, 150, false, false); // image of selected beast (temporary set to placeholder image) 
 		image = new Image("image/background.jpg", 1024, 691.5, false, false); 
 		
-		final ImageView displayImage = new ImageView(selectedImage);
 		final ImageView pointerImage = new ImageView(pointer); 	
 		bgImage = new ImageView(image);
 			
@@ -324,6 +329,14 @@ public class FantasticGUIPrototype extends Application{
 				"-fx-font-size: 18px;" + 
 				"-fx-text-fill: #ffffff;");
 		
+		btAddImage.setMaxHeight(50);
+		btAddImage.setMaxWidth(125);
+		btAddImage.setStyle("-fx-background-color: #E6AF2E; " +
+				"-fx-border-radius: 10 10 10 10;" +
+				"-fx-background-radius: 10 10 10 10;" +
+				"-fx-font-size: 18px;" + 
+				"-fx-text-fill: #ffffff;");
+		
 		btReset.setMaxHeight(50);
 		btReset.setMaxWidth(100);
 		btReset.setStyle("-fx-background-color: #E6AF2E; " +
@@ -432,6 +445,7 @@ public class FantasticGUIPrototype extends Application{
 		
 		btBack.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btSearch.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
+		btAddImage.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btReset.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btEdit.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btMainMenu.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
@@ -440,6 +454,7 @@ public class FantasticGUIPrototype extends Application{
 		
 		//change cursor to point on exit hover over button
 		btBrowse.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
+		btAddImage.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 		btBack.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));		
 		btEntry.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 		btSearch.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));		
@@ -448,6 +463,34 @@ public class FantasticGUIPrototype extends Application{
 		btMainMenu.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 		btSubmitEntry.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 
+		
+		// add image button event - gives user option to upload image and appends path to creature in catalog 
+		btAddImage.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e) {
+				
+				FileChooser fileChooser = new FileChooser();
+	            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Image files (*.png or *.jpg)", "*.png", "*.jpg");
+	            
+	            fileChooser.getExtensionFilters().add(extFilter);
+				fileChooser.setTitle("Upload Image");
+				File userImage = fileChooser.showOpenDialog(primaryStage);		
+				
+				if (userImage != null){
+					try {
+						java.nio.file.Files.copy( 
+						           userImage.toPath(), 
+						           new java.io.File("image/" + userImage.getName()).toPath(),
+						           java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+						           java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+						           java.nio.file.LinkOption.NOFOLLOW_LINKS );
+						imagePath = "image/" + userImage.getName();
+					} catch (IOException e1) {
+						System.out.println("No Image Found!");
+					}
+				}
+
+			}
+		});
 		
 		
 		// browse button event - launches browse page
@@ -458,10 +501,16 @@ public class FantasticGUIPrototype extends Application{
 				
 				clearPane(pointerImage, bgImage, btBrowse, btEntry);
 				
-				image = new Image("image/black_bg.png", 1024, 691.5, false, false);
-				
+				image = new Image("image/black_bg.png", 1024, 691.5, false, false);	
 				bgImage = new ImageView(image);
 				
+				imageContainer.getChildren().remove(displayImage);
+				
+				selectedImage = new Image("image/placeholder1.png", 150, 150, false, false);
+				displayImage = new ImageView(selectedImage);
+				
+				imageContainer.getChildren().add(displayImage);
+					
 				pane.getChildren().addAll(bgImage, btMainMenu, bxSearch, btSearch, txtSearch, btReset, imageContainer, root);
 				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
 				GridPane.setMargin(bxSearch, new Insets(-200,0,0,200));
@@ -485,10 +534,7 @@ public class FantasticGUIPrototype extends Application{
 				btBrowse.fire();
 				
 			}
-		});
-		
-		
-		
+		});	
 		
 		// new entry button event
 		btEntry.setOnAction(new EventHandler<ActionEvent>(){
@@ -526,7 +572,7 @@ public class FantasticGUIPrototype extends Application{
 				
 				bgImage = new ImageView(image);
 				
-				pane.getChildren().addAll(bgImage, btMainMenu, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEntryName, txtFoodName);
+				pane.getChildren().addAll(bgImage, btAddImage, btMainMenu, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEntryName, txtFoodName);
 				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
 				GridPane.setMargin(bxMessage, new Insets(-200,0,0,275));
 				GridPane.setMargin(txtEntryName, new Insets(50,355,0,390));
@@ -534,6 +580,7 @@ public class FantasticGUIPrototype extends Application{
 				GridPane.setMargin(bxEntryName, new Insets(50,0,0,275));
 				GridPane.setMargin(bxEntryFood, new Insets(175,0,0,275));
 				GridPane.setMargin(btSubmitEntry, new Insets(300,0,0,660));
+				GridPane.setMargin(btAddImage, new Insets(300,0,0,525));
 				
 			}
 		});
@@ -543,9 +590,14 @@ public class FantasticGUIPrototype extends Application{
 				
 				homeScreen = false;
 				editMode = true;
-				
+							
 				name = results[0].trim().split(":");  // store name results of entry user would like to edit 
 				food = results[1].trim().split(":");  // store food results of entry user would like to edit
+				oldImagePath = results[2].trim();
+				
+				imagePath = oldImagePath; // in case user decides not to choose a new image
+				
+				System.out.print(oldImagePath);
 				
 				btReset.fire(); // reset the browse screen
 				
@@ -581,7 +633,7 @@ public class FantasticGUIPrototype extends Application{
 				txtEditName.setText(name[1]);
 				txtEditFood.setText(food[1]);
 				
-				pane.getChildren().addAll(bgImage, btMainMenu, btBack, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEditName, txtEditFood);
+				pane.getChildren().addAll(bgImage, btAddImage, btMainMenu, btBack, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEditName, txtEditFood);
 				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
 				GridPane.setMargin(btBack, new Insets(-475,0,0,20));
 				GridPane.setMargin(bxMessage, new Insets(-200,0,0,275));
@@ -590,6 +642,7 @@ public class FantasticGUIPrototype extends Application{
 				GridPane.setMargin(bxEntryName, new Insets(50,0,0,275));
 				GridPane.setMargin(bxEntryFood, new Insets(175,0,0,275));
 				GridPane.setMargin(btSubmitEntry, new Insets(300,0,0,660));
+				GridPane.setMargin(btAddImage, new Insets(300,0,0,525));
 				
 			}
 		});
@@ -609,7 +662,6 @@ public class FantasticGUIPrototype extends Application{
 				image = new Image("image/background.jpg", 1024, 691.5, false, false);
 				
 				bgImage = new ImageView(image);
-				
 				
 				setPane(bgImage, pointerImage, btBrowse, btEntry);
 				
@@ -665,7 +717,7 @@ public class FantasticGUIPrototype extends Application{
 				
 				if (editMode == true){
 					try {
-						myBeasts.editData(name[1].trim(), food[1].trim(), txtEditName.getText().trim(), txtEditFood.getText().trim());
+						myBeasts.editData(name[1].trim(), food[1].trim(), oldImagePath, txtEditName.getText().trim(), txtEditFood.getText().trim(), imagePath);
 					} catch (IOException e) {
 						System.out.println("File not found!");
 					}
@@ -674,7 +726,7 @@ public class FantasticGUIPrototype extends Application{
 				}
 				else if (editMode == false){
 					try {
-						String results = myBeasts.enterData(txtEntryName.getText(), txtFoodName.getText());
+						String results = myBeasts.enterData(txtEntryName.getText(), txtFoodName.getText(), imagePath);
 						TypewriterAnimation(lblMessage, results, 1500);
 						txtEntryName.setStyle("-fx-font-size: 15px;" + 
 								"-fx-text-fill: #a9a9a9;");
@@ -709,19 +761,26 @@ public class FantasticGUIPrototype extends Application{
 					
 					// display name and food on separate lines
 					if (results.length == 1 && !results[0].equals("No results found!")){
-						String[] tempResults = new String [2];
+						String[] tempResults = new String [3];
 						for (String result: results[0].split(";")) {
 							tempResults[i] = result;
 							i++;
 						}
 						results = tempResults;
-						options = new Label[results.length];
+						options = new Label[results.length - 1]; // -1 to remove image location information from being displayed
 						
 						if (!pane.getChildren().contains(btEdit)){
 							pane.getChildren().add(btEdit);
 						}
 						
 						GridPane.setMargin(btEdit, new Insets(385,0,0,715));
+						
+						imageContainer.getChildren().remove(displayImage);
+						
+						selectedImage = new Image (results[2], 150, 150, false, false);
+						displayImage = new ImageView(selectedImage);
+						
+						imageContainer.getChildren().add(displayImage);
 						
 					}
 					else if (results.length > 1 || results[0].equals("No results found!")) {
@@ -737,6 +796,7 @@ public class FantasticGUIPrototype extends Application{
 						bxMenu.getChildren().add(option);
 						i++;
 					}
+					
 				
 				} catch (IOException e1) {
 					System.out.println("Not Found");
@@ -751,11 +811,16 @@ public class FantasticGUIPrototype extends Application{
 				
 				bxMenu.getChildren().clear();
 				pane.getChildren().remove(btEdit);
+				
+				imageContainer.getChildren().remove(displayImage);
+				selectedImage = new Image("image/placeholder1.png", 150, 150, false, false);
+				displayImage = new ImageView(selectedImage);
+				imageContainer.getChildren().add(displayImage);
+				
 				bxMenu.getChildren().add(lblResults);
 				txtSearch.setStyle("-fx-font-size: 15px;" + 
 						"-fx-text-fill: #a9a9a9;");
 				txtSearch.setText("Enter the name of a creature...");
-
 				
 				newSearch = true;
 			}

@@ -70,7 +70,7 @@ public class FantasticBeastsCatalog {
 	}
 	
 	// method to enter data into the catalog
-	String enterData(String nameEntered, String foodEntered) throws IOException{
+	String enterData(String nameEntered, String foodEntered, String imagePath) throws IOException{
 			
 		boolean matchesFound = false;  // tracks if any matches are found in the catalog		
 	
@@ -102,7 +102,7 @@ public class FantasticBeastsCatalog {
 			return "Hate to break it to you, but we've already found that one...";
 		}
 		
-		output.print("\n" + nameEntered.trim() + ", " + foodEntered.trim());		
+		output.print("\n" + nameEntered.trim() + ", " + foodEntered.trim() + " ;" + imagePath.trim());		
 		output.close();
 		
 		return "Thank you for the entry. Your assistance is very much appreciated!";
@@ -211,7 +211,7 @@ public class FantasticBeastsCatalog {
 	
 	// method to replace data in the catalog 
 	// code adapted from http://java.happycodings.com/core-java/code69.html
-	void editData(String oldName, String oldFood, String newName, String newFood) throws IOException{
+	void editData(String oldName, String oldFood, String oldImagePath, String newName, String newFood, String newImagePath) throws IOException{
 					
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 
@@ -223,8 +223,8 @@ public class FantasticBeastsCatalog {
 		}
 		
 		reader.close();
-		
-		String newText = oldText.replaceAll(oldName + ", " + oldFood, newName + ", " + newFood);
+
+		String newText = oldText.replaceAll(oldName + ", " + oldFood + " ;" +  oldImagePath, newName + ", " + newFood + " ;" + newImagePath);
 		
 		FileWriter writer = new FileWriter(file);
 		writer.write(newText);
