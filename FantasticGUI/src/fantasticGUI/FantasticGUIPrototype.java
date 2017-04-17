@@ -73,6 +73,11 @@ public class FantasticGUIPrototype extends Application{
 	static boolean newSearch = true; // used to determine if txtSearch properties need to change
 	static boolean newFood = true;
 	static boolean newBeast = true;
+	static boolean editMode = false;
+	
+	static String[] results;
+	static String[] name;
+	static String[] food; 
 	
 	static{
 		try {
@@ -87,9 +92,7 @@ public class FantasticGUIPrototype extends Application{
 	private GridPane pane = new GridPane(); // main pane 
 	
 	public void start(Stage primaryStage) {
-		
-		System.out.println(javafx.scene.text.Font.getFamilies());
-		
+				
 		// pane(s)
 		final ScrollPane sp = new ScrollPane();
 			
@@ -109,10 +112,12 @@ public class FantasticGUIPrototype extends Application{
 		
 		// button(s)
 		final Button btBrowse = new Button("Browse");
+		final Button btBack = new Button("Back");
 		final Button btEntry = new Button("New Entry");
 		final Button btSubmitEntry = new Button("Submit");
 		final Button btSearch = new Button("Search");
 		final Button btReset = new Button("Reset");
+		final Button btEdit = new Button("Edit");
 		final Button btMainMenu = new Button("Main Menu");
 		
 		// group(s)
@@ -161,7 +166,9 @@ public class FantasticGUIPrototype extends Application{
 		// input(s)
 		final TextField txtSearch = new TextField();
 		final TextField txtEntryName = new TextField(); 	
-		final TextField txtFoodName = new TextField(); 	
+		final TextField txtFoodName = new TextField(); 
+		final TextField txtEditName = new TextField(); 	
+		final TextField txtEditFood = new TextField(); 	
 		
 		// input attributes
 		txtSearch.setPrefColumnCount(20);
@@ -181,6 +188,14 @@ public class FantasticGUIPrototype extends Application{
 		txtFoodName.setStyle("-fx-font-size: 15px;" + 
 				"-fx-text-fill: #a9a9a9;");
 		txtFoodName.setText("Enter the name of the food it eats...");
+		
+		txtEditName.setPrefColumnCount(20);
+		txtEditName.setPrefHeight(40);
+		txtEditName.setStyle("-fx-font-size: 15px;");
+		
+		txtEditFood.setPrefColumnCount(20);
+		txtEditFood.setPrefHeight(40);
+		txtEditFood.setStyle("-fx-font-size: 15px;");
 		
 		// label attributes
 		lblSearch.setStyle("-fx-font-weight: bold; "
@@ -276,7 +291,14 @@ public class FantasticGUIPrototype extends Application{
 				"-fx-border-radius: 10 10 10 10;" +
 				"-fx-font-size: 18px;" +
 				"-fx-text-fill: #eff1f3;");
-
+		
+		btBack.setMaxHeight(50);
+		btBack.setMaxWidth(125);
+		btBack.setStyle("-fx-background-color: transparent; " +
+				"-fx-border-color: #ffffff; " +
+				"-fx-border-radius: 10 10 10 10;" +
+				"-fx-font-size: 18px;" +
+				"-fx-text-fill: #eff1f3;");
 		
 		btEntry.setMaxHeight(50);
 		btEntry.setMaxWidth(125);
@@ -305,6 +327,14 @@ public class FantasticGUIPrototype extends Application{
 		btReset.setMaxHeight(50);
 		btReset.setMaxWidth(100);
 		btReset.setStyle("-fx-background-color: #E6AF2E; " +
+				"-fx-border-radius: 10 10 10 10;" +
+				"-fx-background-radius: 10 10 10 10;" +
+				"-fx-font-size: 18px;" + 
+				"-fx-text-fill: #ffffff;");
+		
+		btEdit.setMaxHeight(50);
+		btEdit.setMaxWidth(100);
+		btEdit.setStyle("-fx-background-color: #E6AF2E; " +
 				"-fx-border-radius: 10 10 10 10;" +
 				"-fx-background-radius: 10 10 10 10;" +
 				"-fx-font-size: 18px;" + 
@@ -400,23 +430,27 @@ public class FantasticGUIPrototype extends Application{
 			
 		});
 		
+		btBack.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btSearch.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btReset.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
+		btEdit.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btMainMenu.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		btSubmitEntry.setOnMouseEntered(me -> scene.setCursor(Cursor.HAND));
 		
 		
 		//change cursor to point on exit hover over button
-		btBrowse.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));		
+		btBrowse.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
+		btBack.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));		
 		btEntry.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 		btSearch.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));		
 		btReset.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
+		btEdit.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 		btMainMenu.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 		btSubmitEntry.setOnMouseExited(me -> scene.setCursor(Cursor.DEFAULT));
 
 		
 		
-		// browse button event
+		// browse button event - launches browse page
 		btBrowse.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e) {
 				
@@ -440,11 +474,28 @@ public class FantasticGUIPrototype extends Application{
 			}
 		});
 		
+		// back button event - navigates back to browse page
+		btBack.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e) {
+				
+				pane.getChildren().clear();
+				write.stop();
+				write.pause();
+				
+				btBrowse.fire();
+				
+			}
+		});
+		
+		
+		
+		
 		// new entry button event
 		btEntry.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e) {
 				
 				homeScreen = false;
+				editMode = false;
 				
 				clearPane(pointerImage, bgImage, btBrowse, btEntry);
 				
@@ -480,6 +531,62 @@ public class FantasticGUIPrototype extends Application{
 				GridPane.setMargin(bxMessage, new Insets(-200,0,0,275));
 				GridPane.setMargin(txtEntryName, new Insets(50,355,0,390));
 				GridPane.setMargin(txtFoodName, new Insets(175,355,0,390));
+				GridPane.setMargin(bxEntryName, new Insets(50,0,0,275));
+				GridPane.setMargin(bxEntryFood, new Insets(175,0,0,275));
+				GridPane.setMargin(btSubmitEntry, new Insets(300,0,0,660));
+				
+			}
+		});
+		
+		btEdit.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e) {
+				
+				homeScreen = false;
+				editMode = true;
+				
+				name = results[0].trim().split(":");  // store name results of entry user would like to edit 
+				food = results[1].trim().split(":");  // store food results of entry user would like to edit
+				
+				btReset.fire(); // reset the browse screen
+				
+				pane.getChildren().clear();
+				
+				TypewriterAnimation(lblMessage, "So you've found additional information on this creature?", 1500);
+				
+			    PauseTransition pause = new PauseTransition(
+			            Duration.seconds(2)
+			        );
+			    
+			    pause.setOnFinished(event -> {
+			    	
+			    	TypewriterAnimation(lblMessage, "What do yo mean there is a mistake in my catalog?!", 500);
+			    });
+				
+			    pause.play();
+			    
+			    pause = new PauseTransition(
+			            Duration.seconds(4)
+			        );
+			    
+			    pause.setOnFinished(event -> {
+			    	TypewriterAnimation(lblMessage, "Very well, please make the changes below:", 1500);
+			    });
+			    
+			    pause.play();
+				
+				image = new Image("image/black_bg.png", 1024, 691.5, false, false);
+				
+				bgImage = new ImageView(image);
+								
+				txtEditName.setText(name[1]);
+				txtEditFood.setText(food[1]);
+				
+				pane.getChildren().addAll(bgImage, btMainMenu, btBack, btSubmitEntry, bxMessage, bxEntryName, bxEntryFood, txtEditName, txtEditFood);
+				GridPane.setMargin(btMainMenu, new Insets(-600,0,0,20));
+				GridPane.setMargin(btBack, new Insets(-475,0,0,20));
+				GridPane.setMargin(bxMessage, new Insets(-200,0,0,275));
+				GridPane.setMargin(txtEditName, new Insets(50,355,0,390));
+				GridPane.setMargin(txtEditFood, new Insets(175,355,0,390));
 				GridPane.setMargin(bxEntryName, new Insets(50,0,0,275));
 				GridPane.setMargin(bxEntryFood, new Insets(175,0,0,275));
 				GridPane.setMargin(btSubmitEntry, new Insets(300,0,0,660));
@@ -556,20 +663,31 @@ public class FantasticGUIPrototype extends Application{
 				// TO-DO: give user option of adding more than one food
 				// Optional<ButtonType> result = alert.showAndWait();
 				
-				try {
-					String results = myBeasts.enterData(txtEntryName.getText(), txtFoodName.getText());
-					TypewriterAnimation(lblMessage, results, 1500);
-					txtEntryName.setStyle("-fx-font-size: 15px;" + 
-							"-fx-text-fill: #a9a9a9;");
-					txtEntryName.setText("Enter the name of the creature...");
-					txtFoodName.setStyle("-fx-font-size: 15px;" + 
-							"-fx-text-fill: #a9a9a9;");
-					txtFoodName.setText("Enter the name of the food it eats...");
-					newBeast = true;
-					newFood = true;
-				
-				} catch (IOException e1) {
-					System.out.println("Not Found");
+				if (editMode == true){
+					try {
+						myBeasts.editData(name[1].trim(), food[1].trim(), txtEditName.getText().trim(), txtEditFood.getText().trim());
+					} catch (IOException e) {
+						System.out.println("File not found!");
+					}
+					TypewriterAnimation(lblMessage, "Thank you for your help!", 1500);
+					
+				}
+				else if (editMode == false){
+					try {
+						String results = myBeasts.enterData(txtEntryName.getText(), txtFoodName.getText());
+						TypewriterAnimation(lblMessage, results, 1500);
+						txtEntryName.setStyle("-fx-font-size: 15px;" + 
+								"-fx-text-fill: #a9a9a9;");
+						txtEntryName.setText("Enter the name of the creature...");
+						txtFoodName.setStyle("-fx-font-size: 15px;" + 
+								"-fx-text-fill: #a9a9a9;");
+						txtFoodName.setText("Enter the name of the food it eats...");
+						newBeast = true;
+						newFood = true;
+					
+					} catch (IOException e1) {
+						System.out.println("Not Found");
+					}
 				}
 			}
 			
@@ -583,14 +701,14 @@ public class FantasticGUIPrototype extends Application{
 				bxMenu.getChildren().add(lblResults);
 				
 				try {
-					String[] results = myBeasts.retrieveData(txtSearch.getText().trim().replaceAll("\\s+",""));
+					results = myBeasts.retrieveData(txtSearch.getText().trim().replaceAll("\\s+",""));
 					Label[] options = new Label[results.length];
-
+										
 					// create and add labels to menu box
 					int i = 0;
 					
 					// display name and food on separate lines
-					if (results.length == 1){
+					if (results.length == 1 && !results[0].equals("No results found!")){
 						String[] tempResults = new String [2];
 						for (String result: results[0].split(";")) {
 							tempResults[i] = result;
@@ -598,8 +716,20 @@ public class FantasticGUIPrototype extends Application{
 						}
 						results = tempResults;
 						options = new Label[results.length];
+						
+						if (!pane.getChildren().contains(btEdit)){
+							pane.getChildren().add(btEdit);
+						}
+						
+						GridPane.setMargin(btEdit, new Insets(385,0,0,715));
+						
 					}
-									
+					else if (results.length > 1 || results[0].equals("No results found!")) {
+						if (pane.getChildren().contains(btEdit)){
+							pane.getChildren().remove(btEdit);
+						}
+					}
+					
 					i = 0;
 					for (Label option: options){
 						option = new Label (results[i]);
@@ -620,6 +750,7 @@ public class FantasticGUIPrototype extends Application{
 			public void handle(ActionEvent e) {
 				
 				bxMenu.getChildren().clear();
+				pane.getChildren().remove(btEdit);
 				bxMenu.getChildren().add(lblResults);
 				txtSearch.setStyle("-fx-font-size: 15px;" + 
 						"-fx-text-fill: #a9a9a9;");

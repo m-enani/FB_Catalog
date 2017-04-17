@@ -15,20 +15,26 @@ package fantasticGUI;
  */
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
+import static java.nio.file.StandardCopyOption.*;
 
 public class FantasticBeastsCatalog {
 	
 	// create file instance
-	static File file = new File("catalog.txt");
+	static File file = new File("bin/text/catalog.txt");
 	static Scanner catalog; 
 	static PrintWriter output;
 	
@@ -96,7 +102,7 @@ public class FantasticBeastsCatalog {
 			return "Hate to break it to you, but we've already found that one...";
 		}
 		
-		output.print("\n" + nameEntered + ", " + foodEntered);		
+		output.print("\n" + nameEntered.trim() + ", " + foodEntered.trim());		
 		output.close();
 		
 		return "Thank you for the entry. Your assistance is very much appreciated!";
@@ -202,4 +208,29 @@ public class FantasticBeastsCatalog {
 		return result;
 	
 	}
+	
+	// method to replace data in the catalog 
+	// code adapted from http://java.happycodings.com/core-java/code69.html
+	void editData(String oldName, String oldFood, String newName, String newFood) throws IOException{
+					
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+
+		String line ="";
+		String oldText = "";
+		
+		while ((line = reader.readLine()) != null) {
+			oldText += line + "\n";
+		}
+		
+		reader.close();
+		
+		String newText = oldText.replaceAll(oldName + ", " + oldFood, newName + ", " + newFood);
+		
+		FileWriter writer = new FileWriter(file);
+		writer.write(newText);
+		
+		writer.close();
+		
+	}
+	
 }
