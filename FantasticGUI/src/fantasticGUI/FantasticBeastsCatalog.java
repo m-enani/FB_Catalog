@@ -1,12 +1,12 @@
 package fantasticGUI;
 /*
  * Name: Mahmoud Enani
- * Date: 04/03/2017
+ * Date: 04/27/2017
  * Language: Java
  * Version: 8
  * Includes: None
  * Class: COP2552.OM1
- * Assignment: Project 3
+ * Assignment: Final Project
  */
 
 /*
@@ -77,7 +77,7 @@ public class FantasticBeastsCatalog {
 		catalog = new Scanner(file);
 		output = new PrintWriter(new FileWriter(file, true)); 
 		
-		if ((nameEntered.equals("Enter the name of the creature...") || nameEntered.trim().equals(""))  && (foodEntered.equals("Enter the name of the food it eats...") || foodEntered.trim().equals("")))  {
+		if ((nameEntered.equals("Creature's name...") || nameEntered.trim().equals(""))  && (foodEntered.equals("Food it eats...") || foodEntered.trim().equals("")))  {
 			return "It seems like you may have forgotten to enter the information. Please try again:";
 		}
 		else if((!nameEntered.equals("Enter the name of the creature...") || !nameEntered.trim().equals("")) && (foodEntered.equals("Enter the name of the food it eats...")|| foodEntered.trim().equals(""))){

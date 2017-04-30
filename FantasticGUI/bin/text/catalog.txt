@@ -1,4 +1,4 @@
-Abraxan, Still working on this one! Check back later! ;image/placeholder1.png
+Abraxan,  Still working on this one! Check back later! ;image/placeholder1.png
 Acromantula, Carnivorous ;image/placeholder1.png
 Aethonan, Still working on this one! Check back later! ;image/placeholder1.png
 Alizor of Westacottus, Still working on this one! Check back later! ;image/placeholder1.png
@@ -131,3 +131,5 @@ Werewolf, Rare Meat ;image/placeholder1.png
 Wide-mouth toad, Still working on this one! Check back later! ;image/placeholder1.png
 Winged horse, Still working on this one! Check back later! ;image/placeholder1.png
 Yeti, Anything! ;image/placeholder1.png
+
+Eman, Fries ;image/left.png
